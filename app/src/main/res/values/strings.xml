@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Pet-Care</string>
+    <string name="title_activity_logged_in">LoggedInActivity</string>
+
+</resources>
