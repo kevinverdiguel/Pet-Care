@@ -1,7 +1,9 @@
 package com.example.petcare.Screens
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.graphics.Color.parseColor
 import android.os.Bundle
 import android.util.Log
@@ -21,11 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.Composable
@@ -57,6 +54,7 @@ import com.example.petcare.ui.Components.TopBar
 import com.example.petcare.Navigation.Destinations
 import com.example.petcare.Navigation.NavigationHost
 import com.example.petcare.R
+import androidx.compose.ui.platform.LocalContext
 import com.example.petcare.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -109,7 +107,11 @@ fun LoginScreen(
 
     val auth: FirebaseAuth
     auth = Firebase.auth
+
     val focusManager = LocalFocusManager.current
+
+    val context = LocalContext.current
+
 
     var email by remember{
         mutableStateOf("")
@@ -120,7 +122,7 @@ fun LoginScreen(
     }
 
     val isEmailValid by derivedStateOf {
-        Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        Patterns.EMAIL_ADDRESS.matcher(email.toString()).matches()
     }
 
     val isPasswordValid by derivedStateOf {
@@ -138,8 +140,9 @@ fun LoginScreen(
                 Log.d(TAG, "signInWithEmail:success")
                 val user = auth.currentUser
                 goToMenu()
-            } else{
+            } else if (!task.isSuccessful){
                 Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                Toast.makeText(context, "Fallo al autenticar", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -189,7 +192,8 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(all = 10.dp)
             ){
-                TextField(
+
+                OutlinedTextField(
                     value = email,
                     onValueChange = {email = it},
                     label = { Text("Correo electrónico") },
@@ -203,7 +207,7 @@ fun LoginScreen(
                     keyboardActions = KeyboardActions (
                         onNext = { focusManager.moveFocus(FocusDirection.Down)}
                     ),
-                    isError = isEmailValid,
+                    isError = !isEmailValid,
                     trailingIcon = {
                         if (email.isNotBlank()){
                             IconButton(onClick = { email = ""}) {
@@ -217,7 +221,8 @@ fun LoginScreen(
                     }
 
                 )
-                TextField(
+
+                OutlinedTextField(
                     value = password,
                     onValueChange = {password = it},
                     label = { Text("Contraseña") },
@@ -243,8 +248,8 @@ fun LoginScreen(
                 )
                 Button(onClick = { signin() },
                     modifier = Modifier.fillMaxWidth(),
-                    //colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_primaryContainer),
-                    enabled = isEmailValid && isPasswordValid)
+                    colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_primaryContainer),
+                    enabled = isPasswordValid && isEmailValid)
                 {
                     Text(text = "Iniciar sesión",
                         fontWeight = FontWeight.Bold,
@@ -288,7 +293,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(all = 16.dp),
-            //colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_onSecondaryContainer)
+            colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_onSecondaryContainer)
         ){
             Text(
                 text = "Regístrate aquí",

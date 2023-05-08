@@ -137,7 +137,7 @@ fun PetProfileMenu(
 
         ){
             Text(
-                text = "Mamá Gatuna",
+                text = "Ultima mascota",
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold,
                 fontSize = 32.sp,

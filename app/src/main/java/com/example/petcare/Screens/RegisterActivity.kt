@@ -61,10 +61,11 @@ class RegisterActivity : ComponentActivity(){
         }
     }
 }
-@Preview(showBackground = true)
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun RegisterForm(
-    goToLogin: () -> Unit = {}
+    goToLogin: () -> Unit = {},
+    goToMenu: () -> Unit = {}
 ){
 
     val auth:FirebaseAuth
@@ -124,6 +125,7 @@ fun RegisterForm(
                 if (task.isSuccessful){
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
+                    goToMenu()
 
                 }  else{
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)

@@ -196,7 +196,12 @@ fun NavigationHost( navController:NavHostController ){
         composable(RegisterRoute.route){
             RegisterForm( goToLogin = {
                 navController.navigate(LoginRoute.route)
-            })
+            },
+                goToMenu = {
+                    navController.navigate(MenuToChoose.route)
+                }
+            )
+            
         }
 
 
