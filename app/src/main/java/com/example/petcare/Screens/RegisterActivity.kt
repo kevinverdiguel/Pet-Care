@@ -112,8 +112,12 @@ fun RegisterForm(
         surname: String,
         email: String,
         password: String,
-        confirmPassword: String
+        confirmPassword: String,
+        //veterinario = true
     ){
+        /*var user = hashMapOf(
+            first
+        )*/
         if (validateData(name, surname, email, password, confirmPassword)){
             //Log.d(RegisterActivity::class.java.simpleName, "Name: $name, Surname: $surname, Password: $password")
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity()) {task ->

@@ -21,6 +21,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.Composable
@@ -184,8 +189,7 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(all = 10.dp)
             ){
-
-                OutlinedTextField(
+                TextField(
                     value = email,
                     onValueChange = {email = it},
                     label = { Text("Correo electrónico") },
@@ -213,8 +217,7 @@ fun LoginScreen(
                     }
 
                 )
-
-                OutlinedTextField(
+                TextField(
                     value = password,
                     onValueChange = {password = it},
                     label = { Text("Contraseña") },
@@ -240,7 +243,7 @@ fun LoginScreen(
                 )
                 Button(onClick = { signin() },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_primaryContainer),
+                    //colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_primaryContainer),
                     enabled = isEmailValid && isPasswordValid)
                 {
                     Text(text = "Iniciar sesión",
@@ -285,7 +288,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(all = 16.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_onSecondaryContainer)
+            //colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_onSecondaryContainer)
         ){
             Text(
                 text = "Regístrate aquí",
