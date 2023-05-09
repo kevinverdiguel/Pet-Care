@@ -36,7 +36,6 @@ class VaccinesRegister : ComponentActivity() {
             AppDispMovTheme {
                 VaccinesReg()
             }
-
         }
     }
 }

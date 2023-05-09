@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.petcare.ui.composables.CustomOutlinedTextField
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -95,6 +96,10 @@ fun RegisterForm(
     var validatePasswordError = "Debe incluir mayúsculas y minúsculas, número, un caractér especial y mínimo ocho caractéres"
     var validateEqualPasswordError = "Las contraseñas deben ser iguales"
 
+    val checkVet by remember {
+        mutableStateOf(true)
+    }
+
     fun validateData(name: String, surname: String, email: String, password: String, confirmPassword: String): Boolean {
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=]).{8,}".toRegex()
 
@@ -114,12 +119,12 @@ fun RegisterForm(
         email: String,
         password: String,
         confirmPassword: String,
-        //veterinario = true
+        veterinario: Boolean
     ){
         /*var user = hashMapOf(
             first
         )*/
-        if (validateData(name, surname, email, password, confirmPassword)){
+        if (validateData(name, surname, email, password, confirmPassword) && veterinario){
             //Log.d(RegisterActivity::class.java.simpleName, "Name: $name, Surname: $surname, Password: $password")
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity()) {task ->
                 if (task.isSuccessful){
@@ -127,7 +132,10 @@ fun RegisterForm(
                     val user = auth.currentUser
                     goToMenu()
 
-                }  else{
+                }  else if (validateData(name, surname, email, password, confirmPassword) && !veterinario){
+                    //Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                    //Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
+                } else{
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
                 }
@@ -248,9 +256,16 @@ fun RegisterForm(
             )
         )
 
+        Checkbox(
+            checked = checkVet,
+            onCheckedChange = {
+                    checked
+        }
+        )
+
         androidx.compose.material3.Button(
             onClick = {
-                register(name, surname, email, password, confirmPassword)
+                register(name, surname, email, password, confirmPassword, checked)
             },
             modifier = Modifier
                 .padding(20.dp)

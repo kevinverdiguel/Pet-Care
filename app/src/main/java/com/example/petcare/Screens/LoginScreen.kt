@@ -80,30 +80,6 @@ fun LoginScreen(
     goToMenu: () -> Unit = {},
     goToRegister: () -> Unit ={}
 ){
-    /*
-    val navController = rememberNavController()
-
-    val scaffoldState = rememberScaffoldState(
-        drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    )
-
-    val Scope = rememberCoroutineScope()
-    val navigationItem = listOf(
-        Destinations.Pantalla1,
-        Destinations.Pantalla2,
-        Destinations.Pantalla3
-    )
-
-    Scaffold(
-        scaffoldState = scaffoldState ,
-        /* bottomBar = { BottomNavigationBar(navController = navController , items = navigationItem ) }, */
-        topBar = { TopBar(Scope,scaffoldState) },
-        drawerContent = { Drawer(scope = Scope, scaffoldState = scaffoldState, navController = navController , items = navigationItem ) }
-    ) {
-        NavigationHost(navController)
-    }
-
-     */
 
     val auth: FirebaseAuth
     auth = Firebase.auth
