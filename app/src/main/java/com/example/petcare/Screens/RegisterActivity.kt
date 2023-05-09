@@ -1,12 +1,12 @@
 package com.example.petcare.Screens
 
 
+import android.R.attr.checked
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -20,37 +20,34 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PermIdentity
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment.Companion
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.petcare.ui.composables.CustomOutlinedTextField
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import com.example.petcare.R
+import com.example.petcare.ui.composables.CustomOutlinedTextField
 import com.example.petcare.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+
 
 class RegisterActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?){
@@ -96,9 +93,8 @@ fun RegisterForm(
     var validatePasswordError = "Debe incluir mayúsculas y minúsculas, número, un caractér especial y mínimo ocho caractéres"
     var validateEqualPasswordError = "Las contraseñas deben ser iguales"
 
-    val checkVet by remember {
-        mutableStateOf(true)
-    }
+    val checkedState = remember { mutableStateOf(true) }
+
 
     fun validateData(name: String, surname: String, email: String, password: String, confirmPassword: String): Boolean {
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=]).{8,}".toRegex()
@@ -118,13 +114,12 @@ fun RegisterForm(
         surname: String,
         email: String,
         password: String,
-        confirmPassword: String,
-        veterinario: Boolean
+        confirmPassword: String
     ){
         /*var user = hashMapOf(
             first
         )*/
-        if (validateData(name, surname, email, password, confirmPassword) && veterinario){
+        if (validateData(name, surname, email, password, confirmPassword)){
             //Log.d(RegisterActivity::class.java.simpleName, "Name: $name, Surname: $surname, Password: $password")
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity()) {task ->
                 if (task.isSuccessful){
@@ -132,10 +127,10 @@ fun RegisterForm(
                     val user = auth.currentUser
                     goToMenu()
 
-                }  else if (validateData(name, surname, email, password, confirmPassword) && !veterinario){
+                }  /*else if (validateData(name, surname, email, password, confirmPassword)){
                     //Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     //Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
-                } else{
+                }*/ else{
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
                 }
@@ -255,17 +250,20 @@ fun RegisterForm(
                 onDone = { focusManager.clearFocus()}
             )
         )
-
-        Checkbox(
-            checked = checkVet,
-            onCheckedChange = {
-                    checked
-        }
-        )
+        Row{
+            Checkbox(
+                checked = checkedState.value,
+                //modifier = Modifier.padding(16.dp),
+                onCheckedChange = {
+                    checkedState.value = it
+                }
+            )
+            Text(text = "¿Es veterinario?", modifier = Modifier.padding(16.dp))
+       }
 
         androidx.compose.material3.Button(
             onClick = {
-                register(name, surname, email, password, confirmPassword, checked)
+                register(name, surname, email, password, confirmPassword)
             },
             modifier = Modifier
                 .padding(20.dp)

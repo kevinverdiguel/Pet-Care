@@ -12,19 +12,27 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import com.example.petcare.R
 import com.example.petcare.Screens.color
 import com.example.petcare.ui.theme.*
@@ -47,6 +55,7 @@ fun PantallaRegistro(
     goToPatients: () -> Unit = {},
     goToVetCalendar: () -> Unit = {},
 ) {
+
     Column(
         modifier = Modifier
             .background(color = "#CAE1D9".color)
@@ -147,6 +156,8 @@ fun PantallaRegistro(
             Esterilizado(name = "Esterilizado")
             Spacer(modifier = Modifier .padding(4.dp))
             Indicaciones(name = "Indicaciones:")
+            Spacer(modifier = Modifier.padding(4.dp))
+            registrarMascota(text = "Registrar mascota" )
             //Nombre()
             // Edad()
             // Esterilizado()
@@ -184,45 +195,85 @@ fun RegistroMascota() {
 
 @Composable
 fun CuadroEspecie(name:String){
+
+    val animales = listOf("")
+    var mSelectedText by remember { mutableStateOf("") }
+
+
+
     Box(modifier = Modifier
         .size(height = 50.dp, width = 343.dp)
         .clip(RoundedCornerShape(12.dp))
         .background(color = Color(0xffE2ECE9))){
         Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
-        Image(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "", modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .fillMaxSize()
-            .absoluteOffset(x = 140.dp))
+        val expanded by remember { mutableStateOf(false) }
+
     }
 }
 
 @Composable
-fun Genero(name : String){
-    Box(modifier = Modifier
-        .size(height = 50.dp, width = 343.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(color = Color(0xffE2ECE9))){
-        Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
-        Image(painter = painterResource(id = R.drawable.hembra_1), contentDescription ="", modifier = Modifier
-            .fillMaxSize()
-            .absoluteOffset(x = 40.dp)
+fun Genero(name : String) {
+    val listItems = arrayOf("Macho", "Hembra")
+    var selectedItem by remember {
+        mutableStateOf("")
+    }
+
+    var textFieldSize by remember {
+        mutableStateOf(Size.Zero)
+    }
+
+    // state of the menu
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
+    val icon = if (expanded) {
+        Icons.Filled.KeyboardArrowUp
+    } else {
+        Icons.Filled.KeyboardArrowDown
+    }
+
+
+    Box(
+        modifier = Modifier
+            .size(height = 50.dp, width = 343.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = Color(0xffE2ECE9))
+    ) {
+
+        OutlinedTextField(
+            value = selectedItem,
+            onValueChange = { selectedItem },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    textFieldSize = coordinates.size.toSize()
+                },
+            label = Text(text = "Elegir mascota")
         )
-        Image(painter = painterResource(id = R.drawable.genero_masculino_1), contentDescription = "", modifier = Modifier
-            .fillMaxSize()
-            .align(Alignment.CenterEnd)
-            .absoluteOffset(x = 140.dp)
-        )
+
     }
 }
 
 @Composable
 fun Nombre(name:String){
+    var text by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
     Box(modifier = Modifier
         .size(height = 50.dp, width = 343.dp)
         .clip(RoundedCornerShape(12.dp))
         .background(color = Color(0xffE2ECE9))){
-        Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
+        /*Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))*/
+        TextField(value = text,
+            onValueChange = { newText ->
+                text = newText
+            },
+            label = {Text(text = "Nombre")},
+            placeholder = { Text(text = "Ingresa tu nombre")},
+            modifier = Modifier.fillMaxWidth()
 
+        )
     }
 }
 
@@ -248,6 +299,7 @@ fun Esterilizado(name: String){
             .align(Alignment.CenterEnd)
             .fillMaxSize()
             .absoluteOffset(x = 140.dp))
+
     }
 }
 
@@ -260,6 +312,15 @@ fun Indicaciones(name: String){
         Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
 
     }
+}
+
+@Composable
+fun registrarMascota(text: String) {
+    Button(onClick = { /*TODO*/ }){
+        Text(text = "$text")
+    }
+
+
 }
 
 @Preview(showBackground = true)
