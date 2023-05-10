@@ -1,17 +1,13 @@
 package com.example.petcare.Screens
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.content.ContentValues.TAG
-import android.content.Context
-import android.graphics.Color.parseColor
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,23 +20,16 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -48,16 +37,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
-import com.example.petcare.ui.Components.Drawer
-import com.example.petcare.ui.Components.TopBar
-import com.example.petcare.Navigation.Destinations
-import com.example.petcare.Navigation.NavigationHost
 import com.example.petcare.R
-import androidx.compose.ui.platform.LocalContext
 import com.example.petcare.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LoginScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,12 +81,21 @@ fun LoginScreen(
         mutableStateOf("")
     }
 
-    val isEmailValid by derivedStateOf {
-        Patterns.EMAIL_ADDRESS.matcher(email.toString()).matches()
+    var isEmailValid by remember {
+        mutableStateOf(true)
     }
 
-    val isPasswordValid by derivedStateOf {
-        password.length > 7
+    if(email.isNotBlank()){
+        isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email.toString()).matches()
+
+    }
+
+    var isPasswordValid by remember {
+        mutableStateOf(true)
+    }
+
+    if(password.isNotBlank()){
+        isPasswordValid = password.length > 7
     }
 
     var isPasswordVisible by remember {
@@ -169,7 +162,7 @@ fun LoginScreen(
                 modifier = Modifier.padding(all = 10.dp)
             ){
 
-                OutlinedTextField(
+                /*OutlinedTextField(
                     value = email,
                     onValueChange = {email = it},
                     label = { Text("Correo electrónico") },
@@ -192,6 +185,29 @@ fun LoginScreen(
                                     contentDescription = "Borrar email"
                                 )
 
+                            }*/
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Correo electrónico") },
+                    placeholder = { Text("abc@dominio.com") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                    ),
+                    isError = !isEmailValid,
+                    trailingIcon = {
+                        if (email.isNotBlank()) {
+                            IconButton(onClick = { email = "" }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Clear,
+                                    contentDescription = "Borrar email"
+                                )
                             }
                         }
                     }
@@ -211,7 +227,7 @@ fun LoginScreen(
                     keyboardActions = KeyboardActions (
                         onDone = { focusManager.clearFocus()}
                     ),
-                    isError = !isPasswordValid,
+                    //isError = !isPasswordValid,
                     trailingIcon = {
                         IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                             Icon(imageVector = if(isPasswordVisible) Icons.Default.Visibility else

@@ -1,7 +1,6 @@
 package com.example.petcare.Screens
 
 
-import android.R.attr.checked
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
@@ -15,18 +14,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Checkbox
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PermIdentity
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -47,7 +43,6 @@ import com.example.petcare.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-
 
 class RegisterActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?){
@@ -93,8 +88,9 @@ fun RegisterForm(
     var validatePasswordError = "Debe incluir mayúsculas y minúsculas, número, un caractér especial y mínimo ocho caractéres"
     var validateEqualPasswordError = "Las contraseñas deben ser iguales"
 
-    val checkedState = remember { mutableStateOf(true) }
-
+    var checkVet by remember {
+        mutableStateOf(true)
+    }
 
     fun validateData(name: String, surname: String, email: String, password: String, confirmPassword: String): Boolean {
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=]).{8,}".toRegex()
@@ -114,7 +110,7 @@ fun RegisterForm(
         surname: String,
         email: String,
         password: String,
-        confirmPassword: String
+        confirmPassword: String,
     ){
         /*var user = hashMapOf(
             first
@@ -127,10 +123,10 @@ fun RegisterForm(
                     val user = auth.currentUser
                     goToMenu()
 
-                }  /*else if (validateData(name, surname, email, password, confirmPassword)){
+                }  else if (validateData(name, surname, email, password, confirmPassword)){
                     //Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     //Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
-                }*/ else{
+                } else{
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
                 }
@@ -250,16 +246,13 @@ fun RegisterForm(
                 onDone = { focusManager.clearFocus()}
             )
         )
-        Row{
-            Checkbox(
-                checked = checkedState.value,
-                //modifier = Modifier.padding(16.dp),
-                onCheckedChange = {
-                    checkedState.value = it
-                }
-            )
-            Text(text = "¿Es veterinario?", modifier = Modifier.padding(16.dp))
-       }
+
+        Checkbox(
+            checked = checkVet,
+            onCheckedChange = {isChecked ->
+                    checkVet = isChecked
+        }
+        )
 
         androidx.compose.material3.Button(
             onClick = {

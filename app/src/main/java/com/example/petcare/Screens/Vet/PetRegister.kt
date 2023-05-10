@@ -1,41 +1,48 @@
 package com.example.petcare.Screens.Vet
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.RadioButton
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import com.example.petcare.R
 import com.example.petcare.Screens.color
-import com.example.petcare.ui.theme.*
+import com.example.petcare.ui.theme.AppDispMovTheme
+import com.example.petcare.ui.theme.md_theme_light_onSecondaryContainer
+import com.example.petcare.ui.theme.md_theme_light_secondaryContainer
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class PetRegister : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +54,11 @@ class PetRegister : ComponentActivity() {
 
         }
     }
+}
+
+object Option {
+    const val OPTION_1 = "Macho"
+    const val OPTION_2 = "Hembra"
 }
 
 @Composable
@@ -76,7 +88,8 @@ fun PantallaRegistro(
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
                     Button(
                         onClick = { goToVetProfile() },
@@ -86,7 +99,7 @@ fun PantallaRegistro(
                             .size(height = 40.dp, width = 80.dp)
                             .absoluteOffset(x = 1.dp, y = 1.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_onSecondaryContainer)
-                    ){
+                    ) {
                         Text(
                             text = "Perfil",
                             fontWeight = FontWeight.Bold,
@@ -103,7 +116,7 @@ fun PantallaRegistro(
                             .size(height = 40.dp, width = 120.dp)
                             .absoluteOffset(x = 1.dp, y = 1.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_onSecondaryContainer)
-                    ){
+                    ) {
                         Text(
                             text = "Pacientes",
                             fontWeight = FontWeight.Bold,
@@ -120,7 +133,7 @@ fun PantallaRegistro(
                             .size(height = 40.dp, width = 150.dp)
                             .absoluteOffset(x = 1.dp, y = 1.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_onSecondaryContainer)
-                    ){
+                    ) {
                         Text(
                             text = "Calendario",
                             fontWeight = FontWeight.Bold,
@@ -137,35 +150,39 @@ fun PantallaRegistro(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .absoluteOffset(x = 0.dp, y = 310.dp)
+            .absoluteOffset(x = 0.dp, y = 200.dp)
             .fillMaxWidth()
-            .height(700.dp)
+            .fillMaxHeight()
             .clip(RoundedCornerShape(20.dp))
             .background(color = Color(0xff87E0C5))
-    ){
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier .padding(10.dp))
-            CuadroEspecie(name="Especie")
-            Spacer(modifier = Modifier .padding(10.dp))
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(top = 10.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.padding(10.dp))
+            CuadroEspecie(name = "Especie")
+            Spacer(modifier = Modifier.padding(10.dp))
             Genero(name = "Genero:")
-            Spacer(modifier = Modifier .padding(10.dp))
+            Spacer(modifier = Modifier.padding(10.dp))
             Nombre(name = "Nombre:")
-            Spacer(modifier = Modifier .padding(10.dp))
+            Spacer(modifier = Modifier.padding(10.dp))
             Edad(name = "Edad:                     XX/XX/XXXX")
-            Spacer(modifier = Modifier .padding(10.dp))
+            Spacer(modifier = Modifier.padding(10.dp))
             Esterilizado(name = "Esterilizado")
-            Spacer(modifier = Modifier .padding(4.dp))
+            Spacer(modifier = Modifier.padding(4.dp))
             Indicaciones(name = "Indicaciones:")
             Spacer(modifier = Modifier.padding(4.dp))
-            registrarMascota(text = "Registrar mascota" )
+            registrarMascota(text = "Registrar mascota")
             //Nombre()
             // Edad()
             // Esterilizado()
             //Indicaciones()
         }
     }
-    }
-
+}
 
 @Composable
 fun RegistroMascota() {
@@ -194,25 +211,31 @@ fun RegistroMascota() {
 }
 
 @Composable
-fun CuadroEspecie(name:String){
+fun CuadroEspecie(name: String) {
 
     val animales = listOf("")
     var mSelectedText by remember { mutableStateOf("") }
 
 
 
-    Box(modifier = Modifier
-        .size(height = 50.dp, width = 343.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(color = Color(0xffE2ECE9))){
-        Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
+    Box(
+        modifier = Modifier
+            .size(height = 50.dp, width = 343.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = Color(0xffE2ECE9))
+    ) {
+        Text(
+            text = "$name",
+            fontSize = 24.sp,
+            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
+        )
         val expanded by remember { mutableStateOf(false) }
 
     }
 }
 
 @Composable
-fun Genero(name : String) {
+fun Genero(name: String) {
     val listItems = arrayOf("Macho", "Hembra")
     var selectedItem by remember {
         mutableStateOf("")
@@ -227,12 +250,12 @@ fun Genero(name : String) {
         mutableStateOf(false)
     }
 
+
     val icon = if (expanded) {
         Icons.Filled.KeyboardArrowUp
     } else {
         Icons.Filled.KeyboardArrowDown
     }
-
 
     Box(
         modifier = Modifier
@@ -241,36 +264,61 @@ fun Genero(name : String) {
             .background(color = Color(0xffE2ECE9))
     ) {
 
-        OutlinedTextField(
-            value = selectedItem,
-            onValueChange = { selectedItem },
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .onGloballyPositioned { coordinates ->
-                    textFieldSize = coordinates.size.toSize()
-                },
-            label = Text(text = "Elegir mascota")
-        )
+        ) {
+            val (selectedOption, setSelectedOption) = remember { mutableStateOf(Option.OPTION_1) }
 
+            RadioButton(
+                selected = selectedOption == Option.OPTION_1,
+                onClick = { setSelectedOption(Option.OPTION_1) },
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            Text(
+                text = Option.OPTION_1, modifier = Modifier
+                    .padding(start = 8.dp)
+                    .align(Alignment.CenterVertically)
+            )
+
+            RadioButton(
+                selected = selectedOption == Option.OPTION_2,
+                onClick = { setSelectedOption(Option.OPTION_2) },
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .align(Alignment.CenterVertically)
+            )
+            Text(
+                text = Option.OPTION_2, modifier = Modifier
+                    .padding(start = 8.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
     }
+
 }
 
 @Composable
-fun Nombre(name:String){
+fun Nombre(name: String) {
     var text by remember {
         mutableStateOf(TextFieldValue(""))
     }
-    Box(modifier = Modifier
-        .size(height = 50.dp, width = 343.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(color = Color(0xffE2ECE9))){
+    Box(
+        modifier = Modifier
+            .size(height = 50.dp, width = 343.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = Color(0xffE2ECE9))
+    ) {
         /*Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))*/
-        TextField(value = text,
+        TextField(
+            value = text,
             onValueChange = { newText ->
                 text = newText
             },
-            label = {Text(text = "Nombre")},
-            placeholder = { Text(text = "Ingresa tu nombre")},
+            label = { Text(text = "Nombre") },
+            placeholder = { Text(text = "Ingresa el nombre de tu mascota") },
             modifier = Modifier.fillMaxWidth()
 
         )
@@ -278,49 +326,93 @@ fun Nombre(name:String){
 }
 
 @Composable
-fun Edad(name: String){
-    Box(modifier = Modifier
-        .size(height = 50.dp, width = 343.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(color = Color(0xffE2ECE9))){
-        Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
+fun Edad(name: String) {
+    Box(
+        modifier = Modifier
+            .size(height = 50.dp, width = 343.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = Color(0xffE2ECE9))
+    ) {
+        Text(
+            text = "$name",
+            fontSize = 24.sp,
+            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
+        )
 
     }
 }
 
 @Composable
-fun Esterilizado(name: String){
-    Box(modifier = Modifier
-        .size(height = 60.dp, width = 343.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(color = Color(0xffE2ECE9))){
-        Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
-        Image(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "", modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .fillMaxSize()
-            .absoluteOffset(x = 140.dp))
+fun Esterilizado(name: String) {
+    Box(
+        modifier = Modifier
+            .size(height = 60.dp, width = 343.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = Color(0xffE2ECE9))
+    ) {
+        Text(
+            text = "$name",
+            fontSize = 24.sp,
+            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
+        )
+        Image(
+            imageVector = Icons.Default.KeyboardArrowDown,
+            contentDescription = "",
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxSize()
+                .absoluteOffset(x = 140.dp)
+        )
 
     }
 }
 
 @Composable
-fun Indicaciones(name: String){
-    Box(modifier = Modifier
-        .size(height = 100.dp, width = 343.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(color = Color(0xffE2ECE9))){
-        Text(text = "$name", fontSize = 24.sp, modifier = Modifier.absoluteOffset(x = 0.dp, y =10.dp ))
+fun Indicaciones(name: String) {
+    Box(
+        modifier = Modifier
+            .size(height = 100.dp, width = 343.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = Color(0xffE2ECE9))
+    ) {
+        Text(
+            text = "$name",
+            fontSize = 24.sp,
+            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
+        )
 
     }
 }
 
 @Composable
 fun registrarMascota(text: String) {
-    Button(onClick = { /*TODO*/ }){
+    Button(onClick = { registrar()}) {
         Text(text = "$text")
     }
 
 
+}
+
+fun registrar() {
+    val db = Firebase.firestore
+
+    val mascota = hashMapOf(
+        "especie" to "perro",
+        "genero" to "macho",
+        "edad" to  10,
+        "esterilizado" to true,
+    )
+
+    db.collection("mascotas")
+        .add(mascota)
+        .addOnSuccessListener { documentReference ->
+            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+        }
+        .addOnFailureListener { e ->
+            Log.w(TAG, "Error adding document", e)
+        }
+
+    
 }
 
 @Preview(showBackground = true)
