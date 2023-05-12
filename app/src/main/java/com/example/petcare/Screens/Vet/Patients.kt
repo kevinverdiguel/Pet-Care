@@ -9,24 +9,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.style.TextAlign
 import com.example.petcare.R
-import com.example.petcare.Screens.Vet.*
-import com.example.petcare.ui.theme.*
+import com.example.petcare.ui.theme.AppDispMovTheme
+import com.example.petcare.ui.theme.md_theme_light_onSecondaryContainer
+import com.example.petcare.ui.theme.md_theme_light_primary
+import com.example.petcare.ui.theme.md_theme_light_secondaryContainer
 
 class Patients : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -216,7 +222,7 @@ fun PatientsView(
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Button(
+            /*Button(
                 onClick = { goToPetRegister() },
                 enabled = true,
                 modifier = Modifier.weight(1f)
@@ -230,7 +236,7 @@ fun PatientsView(
                     fontSize = 15.sp,
                     modifier = Modifier.wrapContentSize()
                 )
-            }
+            }*/
 
             Button(
                 onClick = { goToVaccinesRegister() },

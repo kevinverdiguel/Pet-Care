@@ -41,6 +41,8 @@ import com.example.petcare.Screens.color
 import com.example.petcare.ui.theme.AppDispMovTheme
 import com.example.petcare.ui.theme.md_theme_light_onSecondaryContainer
 import com.example.petcare.ui.theme.md_theme_light_secondaryContainer
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -157,7 +159,8 @@ fun PantallaRegistro(
             .background(color = Color(0xff87E0C5))
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(top = 10.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -327,16 +330,28 @@ fun Nombre(name: String) {
 
 @Composable
 fun Edad(name: String) {
+
+    var text by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
+
     Box(
         modifier = Modifier
             .size(height = 50.dp, width = 343.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(color = Color(0xffE2ECE9))
     ) {
-        Text(
-            text = "$name",
+        TextField(
+            /*text = "$name",
             fontSize = 24.sp,
-            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
+            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)*/
+            value = text,
+            onValueChange = { newText ->
+                text = newText
+            },
+            label = { Text(text = "Edad") },
+            placeholder = { Text(text = "Ingresa la edad de tu mascota") },
+            modifier = Modifier.fillMaxWidth()
         )
 
     }
@@ -352,16 +367,8 @@ fun Esterilizado(name: String) {
     ) {
         Text(
             text = "$name",
-            fontSize = 24.sp,
+            fontSize = 18.sp,
             modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
-        )
-        Image(
-            imageVector = Icons.Default.KeyboardArrowDown,
-            contentDescription = "",
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxSize()
-                .absoluteOffset(x = 140.dp)
         )
 
     }
@@ -386,31 +393,42 @@ fun Indicaciones(name: String) {
 
 @Composable
 fun registrarMascota(text: String) {
-    Button(onClick = { registrar()}) {
+    val user = FirebaseAuth.getInstance().currentUser
+    Button(onClick = { registrar(user)}) {
         Text(text = "$text")
     }
 
 
 }
 
-fun registrar() {
+fun registrar(userID: FirebaseUser?) {
     val db = Firebase.firestore
+    val user = FirebaseAuth.getInstance().currentUser
+
+    val userIDD = user?.uid
 
     val mascota = hashMapOf(
         "especie" to "perro",
         "genero" to "macho",
         "edad" to  10,
         "esterilizado" to true,
+        "ID_Dueño" to userIDD
     )
 
-    db.collection("mascotas")
-        .add(mascota)
-        .addOnSuccessListener { documentReference ->
-            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-        }
-        .addOnFailureListener { e ->
-            Log.w(TAG, "Error adding document", e)
-        }
+    Log.d(TAG, "$userIDD")
+
+    if (userIDD != null) {
+        db.collection("usuarios")
+            .document(userIDD.toString())
+            .collection("mascotas") // Assuming you want to store "mascotas" under the user's document
+            .add(mascota)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
+    }
 
     
 }

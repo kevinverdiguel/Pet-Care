@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.petcare.Navigation.Destinations.*
 import com.example.petcare.Screens.*
 import com.example.petcare.Screens.User.UserCalendar
@@ -153,7 +152,10 @@ fun NavigationHost( navController:NavHostController ){
             },
             goToLogin = {
                     navController.navigate(LoginRoute.route)
-            }
+            },
+                goToPetRegister = {
+                    navController.navigate(RegisterPatients.route)
+                }
                 )
         }
         // vacunas usuario

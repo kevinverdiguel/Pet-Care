@@ -42,6 +42,7 @@ import com.example.petcare.ui.composables.CustomOutlinedTextField
 import com.example.petcare.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class RegisterActivity : ComponentActivity(){
@@ -119,8 +120,30 @@ fun RegisterForm(
             //Log.d(RegisterActivity::class.java.simpleName, "Name: $name, Surname: $surname, Password: $password")
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity()) {task ->
                 if (task.isSuccessful){
+                    val db = Firebase.firestore
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
+                    val userId = user?.uid
+
+                    var registro = hashMapOf(
+                        "nombre" to "$name",
+                        "apellido" to "$surname",
+                        "email" to  "$email",
+                        "id" to "$userId"
+                    )
+
+                    if (userId != null) {
+                        db.collection("usuarios")
+                            .document(userId)
+                            .set(registro)
+                            .addOnSuccessListener { documentReference ->
+                                Log.d(TAG, "DocumentSnapshot added with ID: $userId")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(TAG, "Error adding document", e)
+                            }
+                    }
+
                     goToMenu()
 
                 }  else if (validateData(name, surname, email, password, confirmPassword)){
