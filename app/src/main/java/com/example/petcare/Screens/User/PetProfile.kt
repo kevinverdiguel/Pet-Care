@@ -63,9 +63,9 @@ fun PetProfileMenu(
     val userRef = db.collection("usuarios").document(userIDD.toString())
     val mascotasRef = userRef.collection("mascotas")
 
-    var especie: String = "Perro"
-    var genero: String = "Macho"
-    var edad: Int = 3
+    var especie: String = "No hay ninguna mascota"
+    var genero: String = ""
+    var edad: Int = 0
     var esterilizado: Boolean = false
 
 
@@ -302,7 +302,7 @@ fun getDataFromFirestore() {
                 colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_light_primary)
             ) {
                 Text(
-                    text = "Registrar paciente",
+                    text = "Registrar mascota",
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     fontSize = 15.sp,

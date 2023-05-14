@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,9 +16,15 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.RadioButton
@@ -27,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -63,12 +71,19 @@ object Option {
     const val OPTION_2 = "Hembra"
 }
 
+object Option2 {
+    const val OPTION2_1 = "Esterilizado"
+    const val OPTION2_2 = "No esterilizado"
+}
+
 @Composable
 fun PantallaRegistro(
     goToVetProfile: () -> Unit = {},
     goToPatients: () -> Unit = {},
     goToVetCalendar: () -> Unit = {},
 ) {
+
+
 
     Column(
         modifier = Modifier
@@ -216,9 +231,12 @@ fun RegistroMascota() {
 @Composable
 fun CuadroEspecie(name: String) {
 
-    val animales = listOf("")
+    val animales = listOf("Perro", "Gato", "Hamster", "Loro")
     var mSelectedText by remember { mutableStateOf("") }
+    var especie by remember { mutableStateOf("Especie") }
 
+
+    var expanded by remember { mutableStateOf(false) }
 
 
     Box(
@@ -228,13 +246,43 @@ fun CuadroEspecie(name: String) {
             .background(color = Color(0xffE2ECE9))
     ) {
         Text(
-            text = "$name",
-            fontSize = 24.sp,
-            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
+            text = "$especie",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp)
         )
-        val expanded by remember { mutableStateOf(false) }
-
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .clickable { expanded = true }
+                .padding(end = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(with(LocalDensity.current) { (343 - 32).toDp() })
+        ) {
+            animales.forEach { animal ->
+                DropdownMenuItem(
+                    onClick = {
+                        mSelectedText = animal
+                        especie = mSelectedText
+                        expanded = false
+                    }
+                ) {
+                    Text(text = animal)
+                }
+            }
+        }
     }
+
+
+
 }
 
 @Composable
@@ -320,11 +368,15 @@ fun Nombre(name: String) {
             onValueChange = { newText ->
                 text = newText
             },
-            label = { Text(text = "Nombre") },
-            placeholder = { Text(text = "Ingresa el nombre de tu mascota") },
+            label = {
+                Text(text = "Nombre")
+            },
+            placeholder = { Text(text = "Ingresa el nombre de tu mascota",
+                style = MaterialTheme.typography.subtitle2.copy(fontSize = 10.sp))
+            },
             modifier = Modifier.fillMaxWidth()
-
         )
+
     }
 }
 
@@ -349,8 +401,11 @@ fun Edad(name: String) {
             onValueChange = { newText ->
                 text = newText
             },
-            label = { Text(text = "Edad") },
-            placeholder = { Text(text = "Ingresa la edad de tu mascota") },
+            label = { Text(text = "Edad")
+                    },
+            placeholder = { Text(text = "Ingresa la edad de tu mascota",
+                style = MaterialTheme.typography.subtitle2.copy(fontSize = 10.sp))
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -359,20 +414,62 @@ fun Edad(name: String) {
 
 @Composable
 fun Esterilizado(name: String) {
+    val listItems = arrayOf("Esterilizado", "No esterilizado")
+
+    // state of the menu
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
+
+    val icon = if (expanded) {
+        Icons.Filled.KeyboardArrowUp
+    } else {
+        Icons.Filled.KeyboardArrowDown
+    }
+
     Box(
         modifier = Modifier
-            .size(height = 60.dp, width = 343.dp)
+            .size(height = 50.dp, width = 343.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(color = Color(0xffE2ECE9))
     ) {
-        Text(
-            text = "$name",
-            fontSize = 18.sp,
-            modifier = Modifier.absoluteOffset(x = 0.dp, y = 10.dp)
-        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            val (selectedOption, setSelectedOption) = remember { mutableStateOf(Option.OPTION_1) }
+
+            RadioButton(
+                selected = selectedOption == Option.OPTION_1,
+                onClick = { setSelectedOption(Option.OPTION_1) },
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            Text(
+                text = Option2.OPTION2_1, modifier = Modifier
+                    .padding(start = 8.dp)
+                    .align(Alignment.CenterVertically)
+            )
+
+            RadioButton(
+                selected = selectedOption == Option.OPTION_2,
+                onClick = { setSelectedOption(Option.OPTION_2) },
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .align(Alignment.CenterVertically)
+            )
+            Text(
+                text = Option2.OPTION2_2, modifier = Modifier
+                    .padding(start = 8.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
+    }
 
     }
-}
 
 @Composable
 fun Indicaciones(name: String) {
@@ -401,17 +498,17 @@ fun registrarMascota(text: String) {
 
 }
 
-fun registrar(userID: FirebaseUser?) {
+fun registrar(userID: FirebaseUser?){//, especie: String, genero: String, edad: Int,esterilizado: Boolean, ) {
     val db = Firebase.firestore
     val user = FirebaseAuth.getInstance().currentUser
 
     val userIDD = user?.uid
 
-    val mascota = hashMapOf(
-        "especie" to "perro",
-        "genero" to "macho",
-        "edad" to  10,
-        "esterilizado" to true,
+    /*val mascota = hashMapOf(
+        "especie" to "$especie",
+        "sexo" to "$genero",
+        "edad" to  edad,
+        "esterilizado" to esterilizado,
         "ID_Dueño" to userIDD
     )
 
@@ -428,7 +525,7 @@ fun registrar(userID: FirebaseUser?) {
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
-    }
+    }*/
 
     
 }

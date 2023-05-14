@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.material.icons.filled.ContactPage
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PermIdentity
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import com.example.petcare.R
 import com.example.petcare.ui.composables.CustomOutlinedTextField
 import com.example.petcare.ui.theme.*
@@ -80,6 +82,7 @@ fun RegisterForm(
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
     var cedula by rememberSaveable { mutableStateOf("") }
+    var telefono by rememberSaveable{ mutableStateOf("") }
 
 
     var validateName by rememberSaveable { mutableStateOf(true) }
@@ -89,6 +92,7 @@ fun RegisterForm(
     var validateConfirmPassword by rememberSaveable { mutableStateOf(true) }
     var validaterePasswordsEqual by rememberSaveable { mutableStateOf(true) }
     var validateCedula by rememberSaveable { mutableStateOf(true) }
+    var validateTelefono by rememberSaveable { mutableStateOf(true) }
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isConfirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -105,7 +109,7 @@ fun RegisterForm(
         mutableStateOf(true)
     }
 
-    fun validateData(name: String, surname: String, email: String, password: String, confirmPassword: String, cedula: String): Boolean {
+    fun validateData(name: String, surname: String, email: String, password: String, confirmPassword: String, cedula: String, telefono: String): Boolean {
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=]).{8,}".toRegex()
 
         validateName = name.isNotBlank()
@@ -113,6 +117,7 @@ fun RegisterForm(
         if(checkVet){
             validateCedula = cedula.isNotBlank()
         }
+        validateTelefono = telefono.isDigitsOnly()
         validateEmail = Patterns.EMAIL_ADDRESS.matcher(email).matches()
         validatePassword = passwordRegex.matches(password)
         validateConfirmPassword = passwordRegex.matches(password)
@@ -128,10 +133,11 @@ fun RegisterForm(
         password: String,
         confirmPassword: String,
         checkVet: Boolean,
-        cedula: String
+        cedula: String,
+        telefono: String
     ){
 
-        if (validateData(name, surname, email, password, confirmPassword, cedula)){
+        if (validateData(name, surname, email, password, confirmPassword, cedula, telefono)){
             //Log.d(RegisterActivity::class.java.simpleName, "Name: $name, Surname: $surname, Password: $password")
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity()) {task ->
                 if (task.isSuccessful){
@@ -148,7 +154,8 @@ fun RegisterForm(
                             "email" to  "$email",
                             "id" to "$userId",
                             "Veterinario" to checkVet,
-                            "Cedula" to "$cedula"
+                            "Cedula" to "$cedula",
+                            "Telefono" to "$telefono"
                         )
                         if (userId != null) {
                             db.collection("usuarios")
@@ -171,6 +178,7 @@ fun RegisterForm(
                             "email" to  "$email",
                             "id" to "$userId",
                             "Veterinario" to checkVet,
+                            "Telefono" to "$telefono"
                         )
                         if (userId != null) {
                             db.collection("usuarios")
@@ -189,7 +197,7 @@ fun RegisterForm(
 
 
 
-                }  else if (validateData(name, surname, email, password, confirmPassword, cedula)){
+                }  else if (validateData(name, surname, email, password, confirmPassword, cedula, telefono)){
                     //Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     //Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
                 } else{
@@ -276,6 +284,22 @@ fun RegisterForm(
         )
 
         CustomOutlinedTextField(
+            value = telefono,
+            onValueChange = { telefono = it },
+            label = "Telefono",
+            showError = !validateTelefono,
+            leadingIconImageVector = Icons.Default.Phone,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions (
+                onNext = { focusManager.moveFocus(FocusDirection.Down)}
+            ),
+        )
+
+
+        CustomOutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = "Contraseña (8 caracteres. 1 mayuscula, 1 caracter especial y 1 numero.)",
@@ -348,7 +372,7 @@ fun RegisterForm(
 
         androidx.compose.material3.Button(
             onClick = {
-                register(name, surname, email, password, confirmPassword, checkVet, cedula)
+                register(name, surname, email, password, confirmPassword, checkVet, cedula, telefono)
             },
             modifier = Modifier
                 .padding(20.dp)

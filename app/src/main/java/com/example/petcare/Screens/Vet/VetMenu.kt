@@ -1,7 +1,9 @@
 package com.example.petcare.Screens
 
 
+import android.content.ContentValues
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -26,6 +28,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.withStyle
 import com.example.petcare.R
 import com.example.petcare.ui.theme.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class VetMenu : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +51,44 @@ fun vetMenu(
     goToLogin: () -> Unit ={},
 
     ) {
+
+    val db = Firebase.firestore // get a reference to the Firestore database
+    val user = FirebaseAuth.getInstance().currentUser
+    val userIDD = user?.uid
+
+    val userRef = db.collection("usuarios").document(userIDD.toString())
+
+    var nombre: String
+    var Email: String
+    var Telefono: String
+    var Cedula: String
+    var apellido: String
+
+    fun getDataFromFirestore() {
+        userRef.get()
+            .addOnSuccessListener { document ->
+                if (document.exists()){
+                    nombre = document.getString("nombre") ?: ""
+                    apellido = document.getString("apellido") ?: ""
+                    Telefono = document.getString("Telefono") ?: ""
+                    Cedula = document.getString("Cedula") ?: ""
+                    Email = document.getString("email") ?: ""
+
+
+
+                    Log.d(ContentValues.TAG, "$nombre" + "$apellido" + "$Telefono" + "$Cedula" + "$Email")
+                    // Do something with the retrieved data
+                }
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors
+                Log.d(ContentValues.TAG, "Nothing was found")
+
+            }
+    }
+
+    getDataFromFirestore()
+
     Column(
         modifier = Modifier
             .background(color = "#CAE1D9".color)
@@ -156,7 +199,7 @@ fun vetMenu(
 
         ){
             Text(
-                text ="M.V.Z Ericka",
+                text ="M.V.",
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Italic,
@@ -229,7 +272,7 @@ fun vetMenu(
 
                     Text(buildAnnotatedString {
                         withStyle(style = SpanStyle(fontSize = 18.sp, color = md_theme_light_onTertiaryContainer)) {
-                            append("Número de colegiado: ")
+                            append("Número de cedula: ")
                         }
                         withStyle(style = SpanStyle(fontSize = 18.sp, color = md_theme_dark_tertiary)) {
                             append("1918943")
