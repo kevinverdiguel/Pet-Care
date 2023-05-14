@@ -1,6 +1,8 @@
 package com.example.petcare.Screens
 
+import android.content.ContentValues
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -24,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.petcare.R
 import com.example.petcare.ui.theme.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class PetProfile : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +55,44 @@ fun PetProfileMenu(
     goToPetRegister: ()  -> Unit ={}
 
 ) {
+
+    val db = Firebase.firestore // get a reference to the Firestore database
+    val user = FirebaseAuth.getInstance().currentUser
+    val userIDD = user?.uid
+
+    val userRef = db.collection("usuarios").document(userIDD.toString())
+    val mascotasRef = userRef.collection("mascotas")
+
+    var especie: String = "Perro"
+    var genero: String = "Macho"
+    var edad: Int = 3
+    var esterilizado: Boolean = false
+
+
+fun getDataFromFirestore() {
+        mascotasRef.get()
+        .addOnSuccessListener { querySnapshot ->
+            for (document in querySnapshot.documents) {
+                especie = document.getString("especie") ?: ""
+                genero = document.getString("genero") ?: ""
+                edad = document.getLong("edad")?.toInt() ?: 0
+                esterilizado = document.getBoolean("esterilizado") ?: false
+
+
+                Log.d(ContentValues.TAG, "$especie" + "$genero" + "$edad" + "$esterilizado")
+                // Do something with the retrieved data
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Handle errors
+            Log.d(ContentValues.TAG, "Nothing was found")
+
+        }
+    }
+
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -211,10 +254,10 @@ fun PetProfileMenu(
 
                     Text(buildAnnotatedString {
                         withStyle(style = SpanStyle(fontSize = 22.sp, color = md_theme_light_onTertiaryContainer)) {
-                            append("Raza: ")
+                            append("Especie: ")
                         }
                         withStyle(style = SpanStyle(fontSize = 22.sp, color = md_theme_dark_tertiary)) {
-                            append("Europeo")
+                            append("${especie.toString()}")
                         }
                     }
                     )
@@ -224,7 +267,7 @@ fun PetProfileMenu(
                             append("Edad: ")
                         }
                         withStyle(style = SpanStyle(fontSize = 22.sp, color = md_theme_dark_tertiary)) {
-                            append("2 años")
+                            append("${edad.toString()}" + "años")
                         }
                     }
                     )
@@ -234,17 +277,17 @@ fun PetProfileMenu(
                             append("Esterilizado: ")
                         }
                         withStyle(style = SpanStyle(fontSize = 22.sp, color = md_theme_dark_tertiary)) {
-                            append("No")
+                            append(if(esterilizado == true) "Si" else "No")
                         }
                     }
                     )
 
                     Text(buildAnnotatedString {
                         withStyle(style = SpanStyle(fontSize = 22.sp, color = md_theme_light_onTertiaryContainer)) {
-                            append("Indicación Especial: ")
+                            append("Sexo: ")
                         }
                         withStyle(style = SpanStyle(fontSize = 22.sp, color = md_theme_dark_tertiary)) {
-                            append("\n- No exponer al sol\n- Mantener dieta blanda")
+                            append("$genero")
                         }
                     }
                     )

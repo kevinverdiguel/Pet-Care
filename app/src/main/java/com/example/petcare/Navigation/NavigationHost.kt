@@ -7,12 +7,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.petcare.Navigation.Destinations.*
 import com.example.petcare.Screens.*
+import com.example.petcare.Screens.PetProfile
 import com.example.petcare.Screens.User.UserCalendar
 import com.example.petcare.Screens.User.VacunasWithImage
 import com.example.petcare.Screens.Vet.CalendarioView
 import com.example.petcare.Screens.Vet.PantallaRegistro
 import com.example.petcare.Screens.Vet.PatientsView
 import com.example.petcare.Screens.Vet.VaccinesReg
+import com.example.petcare.Screens.VetMenu
 
 @Composable
 fun NavigationHost( navController:NavHostController ){
@@ -27,7 +29,15 @@ fun NavigationHost( navController:NavHostController ){
             },
             goToRegister = {
                 navController.navigate(RegisterRoute.route)
-            })
+            },
+            goToVetMenu = {
+                navController.navigate(Destinations.VetMenu.route)
+            },
+                goToPetProfile = {
+                    navController.navigate(Destinations.PetProfile.route)
+                },
+
+                )
         }
 
 
@@ -201,6 +211,12 @@ fun NavigationHost( navController:NavHostController ){
             },
                 goToMenu = {
                     navController.navigate(MenuToChoose.route)
+                },
+                goToPetProfile = {
+                    navController.navigate(Destinations.PetProfile.route)
+                },
+                goToVetMenu = {
+                    navController.navigate(Destinations.VetMenu.route)
                 }
             )
             

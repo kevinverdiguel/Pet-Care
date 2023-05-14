@@ -1,6 +1,7 @@
 package com.example.petcare.Screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
@@ -41,6 +42,7 @@ import com.example.petcare.R
 import com.example.petcare.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class LoginScreen : ComponentActivity() {
@@ -62,7 +64,9 @@ class LoginScreen : ComponentActivity() {
 @Composable
 fun LoginScreen(
     goToMenu: () -> Unit = {},
-    goToRegister: () -> Unit ={}
+    goToRegister: () -> Unit ={},
+    goToVetMenu: () -> Unit = {},
+    goToPetProfile: () -> Unit = {},
 ){
 
     val auth: FirebaseAuth
@@ -107,11 +111,30 @@ fun LoginScreen(
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginScreen()) { task ->
             if(task.isSuccessful){
                 Log.d(TAG, "signInWithEmail:success")
-                val user = auth.currentUser
-                goToMenu()
+                val db = Firebase.firestore
+                val user = FirebaseAuth.getInstance().currentUser
+
+                val userIDD = user?.uid
+
+                val userRef = db.collection("usuarios").document(userIDD.toString())
+
+                userRef.get().addOnSuccessListener { document ->
+                    val isVeterinary = document.getBoolean("Veterinario") ?: false
+                    if(isVeterinary){
+                        //Log.d(ContentValues.TAG, "it is$isVeterinary")
+                        goToVetMenu()
+
+                    } else{
+                        //Log.d(ContentValues.TAG, "$isVeterinary")
+                        goToPetProfile()
+                    }
+                }.addOnFailureListener { exception ->
+                    // Handle any errors here
+                }
+                //goToMenu()
             } else if (!task.isSuccessful){
                 Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                Toast.makeText(context, "Fallo al autenticar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Fallo al autenticar. Revisar correo y contraseña.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -162,30 +185,6 @@ fun LoginScreen(
                 modifier = Modifier.padding(all = 10.dp)
             ){
 
-                /*OutlinedTextField(
-                    value = email,
-                    onValueChange = {email = it},
-                    label = { Text("Correo electrónico") },
-                    placeholder = { Text ("abc@dominio.com") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions (
-                        onNext = { focusManager.moveFocus(FocusDirection.Down)}
-                    ),
-                    isError = !isEmailValid,
-                    trailingIcon = {
-                        if (email.isNotBlank()){
-                            IconButton(onClick = { email = ""}) {
-                                Icon(
-                                    imageVector = Icons.Filled.Clear,
-                                    contentDescription = "Borrar email"
-                                )
-
-                            }*/
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },

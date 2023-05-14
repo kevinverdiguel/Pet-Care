@@ -15,12 +15,16 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlternateEmail
+import androidx.compose.material.icons.filled.ContactPage
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PermIdentity
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -59,7 +63,9 @@ class RegisterActivity : ComponentActivity(){
 @Composable
 fun RegisterForm(
     goToLogin: () -> Unit = {},
-    goToMenu: () -> Unit = {}
+    goToMenu: () -> Unit = {},
+    goToVetMenu: () -> Unit = {},
+    goToPetProfile: () -> Unit = {},
 ){
 
     val auth:FirebaseAuth
@@ -73,6 +79,8 @@ fun RegisterForm(
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var cedula by rememberSaveable { mutableStateOf("") }
+
 
     var validateName by rememberSaveable { mutableStateOf(true) }
     var validateSurname by rememberSaveable { mutableStateOf(true) }
@@ -80,6 +88,7 @@ fun RegisterForm(
     var validatePassword by rememberSaveable { mutableStateOf(true) }
     var validateConfirmPassword by rememberSaveable { mutableStateOf(true) }
     var validaterePasswordsEqual by rememberSaveable { mutableStateOf(true) }
+    var validateCedula by rememberSaveable { mutableStateOf(true) }
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isConfirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -89,15 +98,21 @@ fun RegisterForm(
     var validatePasswordError = "Debe incluir mayúsculas y minúsculas, número, un caractér especial y mínimo ocho caractéres"
     var validateEqualPasswordError = "Las contraseñas deben ser iguales"
 
+    var isTextFieldEnabled by remember { mutableStateOf(false) }
+
+
     var checkVet by remember {
         mutableStateOf(true)
     }
 
-    fun validateData(name: String, surname: String, email: String, password: String, confirmPassword: String): Boolean {
+    fun validateData(name: String, surname: String, email: String, password: String, confirmPassword: String, cedula: String): Boolean {
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=]).{8,}".toRegex()
 
         validateName = name.isNotBlank()
         validateSurname = surname.isNotBlank()
+        if(checkVet){
+            validateCedula = cedula.isNotBlank()
+        }
         validateEmail = Patterns.EMAIL_ADDRESS.matcher(email).matches()
         validatePassword = passwordRegex.matches(password)
         validateConfirmPassword = passwordRegex.matches(password)
@@ -112,11 +127,11 @@ fun RegisterForm(
         email: String,
         password: String,
         confirmPassword: String,
+        checkVet: Boolean,
+        cedula: String
     ){
-        /*var user = hashMapOf(
-            first
-        )*/
-        if (validateData(name, surname, email, password, confirmPassword)){
+
+        if (validateData(name, surname, email, password, confirmPassword, cedula)){
             //Log.d(RegisterActivity::class.java.simpleName, "Name: $name, Surname: $surname, Password: $password")
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity()) {task ->
                 if (task.isSuccessful){
@@ -124,29 +139,57 @@ fun RegisterForm(
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
                     val userId = user?.uid
+                    //
 
-                    var registro = hashMapOf(
-                        "nombre" to "$name",
-                        "apellido" to "$surname",
-                        "email" to  "$email",
-                        "id" to "$userId"
-                    )
+                    if(checkVet){
+                        var registro = hashMapOf(
+                            "nombre" to "$name",
+                            "apellido" to "$surname",
+                            "email" to  "$email",
+                            "id" to "$userId",
+                            "Veterinario" to checkVet,
+                            "Cedula" to "$cedula"
+                        )
+                        if (userId != null) {
+                            db.collection("usuarios")
+                                .document(userId)
+                                .set(registro)
+                                .addOnSuccessListener { documentReference ->
+                                    Log.d(TAG, "DocumentSnapshot added with ID: $userId")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.w(TAG, "Error adding document", e)
+                                }
+                        }
+                        goToVetMenu()
 
-                    if (userId != null) {
-                        db.collection("usuarios")
-                            .document(userId)
-                            .set(registro)
-                            .addOnSuccessListener { documentReference ->
-                                Log.d(TAG, "DocumentSnapshot added with ID: $userId")
-                            }
-                            .addOnFailureListener { e ->
-                                Log.w(TAG, "Error adding document", e)
-                            }
+                    }
+                    else{
+                        var registro = hashMapOf(
+                            "nombre" to "$name",
+                            "apellido" to "$surname",
+                            "email" to  "$email",
+                            "id" to "$userId",
+                            "Veterinario" to checkVet,
+                        )
+                        if (userId != null) {
+                            db.collection("usuarios")
+                                .document(userId)
+                                .set(registro)
+                                .addOnSuccessListener { documentReference ->
+                                    Log.d(TAG, "DocumentSnapshot added with ID: $userId")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.w(TAG, "Error adding document", e)
+                                }
+                        }
+                        goToPetProfile()
+
                     }
 
-                    goToMenu()
 
-                }  else if (validateData(name, surname, email, password, confirmPassword)){
+
+                }  else if (validateData(name, surname, email, password, confirmPassword, cedula)){
                     //Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     //Toast.makeText(context,"Authetication failed", Toast.LENGTH_SHORT).show()
                 } else{
@@ -235,7 +278,7 @@ fun RegisterForm(
         CustomOutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = "Contraseña",
+            label = "Contraseña (8 caracteres. 1 mayuscula, 1 caracter especial y 1 numero.)",
             showError = !validatePassword,
             errorMessage = validatePasswordError,
             isPasswordField = true,
@@ -270,16 +313,42 @@ fun RegisterForm(
             )
         )
 
-        Checkbox(
-            checked = checkVet,
-            onCheckedChange = {isChecked ->
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = checkVet,
+                onCheckedChange = { isChecked ->
                     checkVet = isChecked
+                    isTextFieldEnabled = isChecked
+                    cedula = ""
+                }
+            )
+            Text("Soy veterinario")
+
         }
+        CustomOutlinedTextField(
+            value = cedula,
+            onValueChange = { cedula = it },
+            label = "Ingresar tu cedula",
+            leadingIconImageVector = Icons.Default.ContactPage,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions (
+                onDone = { focusManager.clearFocus()}
+            ),
+            enabled = checkVet
         )
+
+
+
+
+
 
         androidx.compose.material3.Button(
             onClick = {
-                register(name, surname, email, password, confirmPassword)
+                register(name, surname, email, password, confirmPassword, checkVet, cedula)
             },
             modifier = Modifier
                 .padding(20.dp)

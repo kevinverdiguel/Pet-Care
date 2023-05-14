@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,6 +37,7 @@ fun CustomOutlinedTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     showError: Boolean = false,
+    enabled: Boolean = true,
     errorMessage: String = ""
 ){
     Column(
@@ -57,6 +59,7 @@ fun CustomOutlinedTextField(
                         tint = if (showError) md_theme_light_error else md_theme_light_surfaceTint
                     )
                 },
+                enabled = enabled,
                 isError = showError,
                 trailingIcon = {
                     if (showError && !isPasswordField) Icon(imageVector = Icons.Filled.Error,
@@ -79,7 +82,6 @@ fun CustomOutlinedTextField(
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 singleLine = true,
-
             )
 
     }

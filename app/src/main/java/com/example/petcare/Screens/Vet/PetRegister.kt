@@ -415,7 +415,7 @@ fun registrar(userID: FirebaseUser?) {
         "ID_Dueño" to userIDD
     )
 
-    Log.d(TAG, "$userIDD")
+    //Log.d(TAG, "$userIDD")
 
     if (userIDD != null) {
         db.collection("usuarios")
