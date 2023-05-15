@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -40,10 +41,14 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.example.petcare.R
 import com.example.petcare.Screens.color
 import com.example.petcare.ui.theme.AppDispMovTheme
@@ -53,6 +58,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.collections.HashMap
+import kotlin.collections.HashMap as HashMap1
 
 class PetRegister : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,12 +82,17 @@ object Option2 {
     const val OPTION2_1 = "Esterilizado"
     const val OPTION2_2 = "No esterilizado"
 }
+var mascota = hashMapOf<String, Any>(
+
+)
+
 
 @Composable
 fun PantallaRegistro(
     goToVetProfile: () -> Unit = {},
     goToPatients: () -> Unit = {},
     goToVetCalendar: () -> Unit = {},
+    goToPetProfile: () -> Unit = {},
 ) {
 
 
@@ -193,7 +205,7 @@ fun PantallaRegistro(
             Spacer(modifier = Modifier.padding(4.dp))
             Indicaciones(name = "Indicaciones:")
             Spacer(modifier = Modifier.padding(4.dp))
-            registrarMascota(text = "Registrar mascota")
+            registrarMascota(text = "Registrar mascota", mascota)
             //Nombre()
             // Edad()
             // Esterilizado()
@@ -235,7 +247,6 @@ fun CuadroEspecie(name: String) {
     var mSelectedText by remember { mutableStateOf("") }
     var especie by remember { mutableStateOf("Especie") }
 
-
     var expanded by remember { mutableStateOf(false) }
 
 
@@ -273,6 +284,12 @@ fun CuadroEspecie(name: String) {
                         mSelectedText = animal
                         especie = mSelectedText
                         expanded = false
+                        if(mascota.containsValue("especie")) {
+                            mascota["especie"] = especie
+                        }
+                        else{
+                            mascota["especie"] = especie
+                        }
                     }
                 ) {
                     Text(text = animal)
@@ -296,6 +313,10 @@ fun Genero(name: String) {
         mutableStateOf(Size.Zero)
     }
 
+    var options by remember {
+        mutableStateOf("")
+    }
+
     // state of the menu
     var expanded by remember {
         mutableStateOf(false)
@@ -325,7 +346,8 @@ fun Genero(name: String) {
 
             RadioButton(
                 selected = selectedOption == Option.OPTION_1,
-                onClick = { setSelectedOption(Option.OPTION_1) },
+                onClick = { setSelectedOption(Option.OPTION_1)
+                    options = Option.OPTION_1},
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
@@ -336,7 +358,9 @@ fun Genero(name: String) {
 
             RadioButton(
                 selected = selectedOption == Option.OPTION_2,
-                onClick = { setSelectedOption(Option.OPTION_2) },
+                onClick = { setSelectedOption(Option.OPTION_2)
+                    options = Option.OPTION_2
+                          },
                 modifier = Modifier
                     .padding(start = 16.dp)
                     .align(Alignment.CenterVertically)
@@ -348,6 +372,11 @@ fun Genero(name: String) {
             )
         }
     }
+    if (options == Option.OPTION_1) {
+        mascota.put("sexo", "Macho")
+    } else if(options == Option.OPTION_2) {
+        mascota.put("sexo", "Hembra")
+    }
 
 }
 
@@ -356,6 +385,8 @@ fun Nombre(name: String) {
     var text by remember {
         mutableStateOf(TextFieldValue(""))
     }
+    var nombre = text.text
+
     Box(
         modifier = Modifier
             .size(height = 50.dp, width = 343.dp)
@@ -377,6 +408,12 @@ fun Nombre(name: String) {
             modifier = Modifier.fillMaxWidth()
         )
 
+        if (nombre != null) {
+            mascota.put("nombre", nombre)
+        } else {
+            // Handle the case when the entered text is not a valid integer
+        }
+
     }
 }
 
@@ -386,6 +423,7 @@ fun Edad(name: String) {
     var text by remember {
         mutableStateOf(TextFieldValue(""))
     }
+    val edad = text.text.toIntOrNull()
 
     Box(
         modifier = Modifier
@@ -403,11 +441,19 @@ fun Edad(name: String) {
             },
             label = { Text(text = "Edad")
                     },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
             placeholder = { Text(text = "Ingresa la edad de tu mascota",
                 style = MaterialTheme.typography.subtitle2.copy(fontSize = 10.sp))
             },
             modifier = Modifier.fillMaxWidth()
         )
+        if (edad != null) {
+            mascota.put("edad", edad)
+        } else {
+        }
 
     }
 }
@@ -419,6 +465,10 @@ fun Esterilizado(name: String) {
     // state of the menu
     var expanded by remember {
         mutableStateOf(false)
+    }
+
+    var options by remember {
+        mutableStateOf("")
     }
 
 
@@ -441,11 +491,13 @@ fun Esterilizado(name: String) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            val (selectedOption, setSelectedOption) = remember { mutableStateOf(Option.OPTION_1) }
+            var (selectedOption, setSelectedOption) = remember { mutableStateOf(Option.OPTION_1) }
 
             RadioButton(
                 selected = selectedOption == Option.OPTION_1,
-                onClick = { setSelectedOption(Option.OPTION_1) },
+                onClick = { setSelectedOption(Option.OPTION_1)
+                    options = Option.OPTION_1
+                          },
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
@@ -456,7 +508,10 @@ fun Esterilizado(name: String) {
 
             RadioButton(
                 selected = selectedOption == Option.OPTION_2,
-                onClick = { setSelectedOption(Option.OPTION_2) },
+                onClick = { setSelectedOption(Option.OPTION_2)
+                    options = Option.OPTION_2
+
+                },
                 modifier = Modifier
                     .padding(start = 16.dp)
                     .align(Alignment.CenterVertically)
@@ -468,6 +523,13 @@ fun Esterilizado(name: String) {
             )
         }
     }
+
+    if (options == Option.OPTION_1) {
+        mascota.put("esterilizado", "Si")
+    } else  if (options == Option.OPTION_2){
+        mascota.put("esterilizado", "No")
+    }
+
 
     }
 
@@ -489,30 +551,28 @@ fun Indicaciones(name: String) {
 }
 
 @Composable
-fun registrarMascota(text: String) {
+fun registrarMascota(text: String, hashMap: HashMap<String, Any>,
+                     ) {
     val user = FirebaseAuth.getInstance().currentUser
-    Button(onClick = { registrar(user)}) {
-        Text(text = "$text")
-    }
+    Button(onClick = { registrar(user, hashMap)
 
+    }) {
+        Text(text = "$text")
+
+    }
 
 }
 
-fun registrar(userID: FirebaseUser?){//, especie: String, genero: String, edad: Int,esterilizado: Boolean, ) {
+fun registrar(userID: FirebaseUser?, hashMap: HashMap<String, Any>,
+              ) {
     val db = Firebase.firestore
     val user = FirebaseAuth.getInstance().currentUser
 
     val userIDD = user?.uid
 
-    /*val mascota = hashMapOf(
-        "especie" to "$especie",
-        "sexo" to "$genero",
-        "edad" to  edad,
-        "esterilizado" to esterilizado,
-        "ID_Dueño" to userIDD
-    )
-
-    //Log.d(TAG, "$userIDD")
+    if (userIDD != null) {
+        hashMap.put("UserID", userIDD)
+    }
 
     if (userIDD != null) {
         db.collection("usuarios")
@@ -525,7 +585,8 @@ fun registrar(userID: FirebaseUser?){//, especie: String, genero: String, edad: 
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
-    }*/
+    }
+
 
     
 }

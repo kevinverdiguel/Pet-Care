@@ -13,7 +13,10 @@ import com.example.petcare.Screens.User.VacunasWithImage
 import com.example.petcare.Screens.Vet.CalendarioView
 import com.example.petcare.Screens.Vet.PantallaRegistro
 import com.example.petcare.Screens.Vet.PatientsView
+import com.example.petcare.Screens.Vet.RegistroMascota
 import com.example.petcare.Screens.Vet.VaccinesReg
+import com.example.petcare.Screens.Vet.registrar
+import com.example.petcare.Screens.Vet.registrarMascota
 import com.example.petcare.Screens.VetMenu
 
 @Composable
@@ -132,20 +135,6 @@ fun NavigationHost( navController:NavHostController ){
                             }
 
 
-        composable(CalendarVet.route){
-            CalendarioView(
-            goToVetCalendar = {
-                    navController.navigate(CalendarVet.route)
-            },
-            goToPatients = {
-                navController.navigate(Patients.route)
-            },
-            goToVetProfile = {
-                navController.navigate(Destinations.VetMenu.route)
-            }
-            )
-        }
-
 
 
         // -------------------rutas del usuario --------------------------------- //
@@ -169,6 +158,20 @@ fun NavigationHost( navController:NavHostController ){
                 )
         }
         // vacunas usuario
+
+        composable(CalendarVet.route){
+            CalendarioView(
+                goToVetCalendar = {
+                    navController.navigate(CalendarVet.route)
+                },
+                goToPatients = {
+                    navController.navigate(Patients.route)
+                },
+                goToVetProfile = {
+                    navController.navigate(Destinations.VetMenu.route)
+                }
+            )
+        }
 
         composable(VaccinesUser.route){
             VacunasWithImage(
