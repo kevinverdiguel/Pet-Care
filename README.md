@@ -1,0 +1,5 @@
+![image](https://github.com/kevinverdiguel/Pet-Care/assets/45549790/6ab420ca-7d8a-4025-99bd-d46fedbcaa89)
+![image](https://github.com/kevinverdiguel/Pet-Care/assets/45549790/f8c5ead0-619e-41e3-b60c-813c9858a5cc)
+![image](https://github.com/kevinverdiguel/Pet-Care/assets/45549790/557f705a-ee07-405d-bd22-afcf7ce79201)
+![image](https://github.com/kevinverdiguel/Pet-Care/assets/45549790/fdc3c2fc-206b-47b6-aa2a-e79a90e17f71)
+![image](https://github.com/kevinverdiguel/Pet-Care/assets/45549790/973e50d9-8e51-4e1a-bf0b-fac34972aa53)
